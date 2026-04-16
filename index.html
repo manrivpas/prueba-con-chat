@@ -113,7 +113,7 @@
 <body>
 
     <div class="chat-container">
-        <header>📐 Eratóstenes: Tutor de Bachillerato</header>
+        <header> Eratóstenes: Tutor de Bachillerato</header>
         <div id="chat-box">
             <div class="msg ai">¡Hola! Soy tu tutor de matemáticas. ¿Tienes algún problema de derivadas, integrales o matrices que quieras revisar?</div>
         </div>
@@ -161,9 +161,12 @@
             if (window.MathJax) MathJax.typesetPromise();
             
         } catch (error) {
-            console.error(error); // ESTO ES CLAVE: Mira la consola F12 para ver el error real
-            chatBox.innerHTML += `<div class="msg ai" style="color:red">Error: No se pudo conectar con el tutor.</div>`;
-        }
+    console.error("Detalles del error:", error);
+    // Esto te dirá el error real en la pantalla del chat
+    chatBox.innerHTML += `<div class="msg ai" style="color:red">
+        <b>Error técnico:</b> ${error.message}
+    </div>`;
+}
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 </script>
