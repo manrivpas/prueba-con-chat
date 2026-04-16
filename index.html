@@ -1,161 +1,31 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eratóstenes - Tu Tutor de Mates</title>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
-    <style>
-        :root {
-            --primary-color: #2563eb;
-            --bg-color: #f8fafc;
-            --user-msg: #dbeafe;
-            --ai-msg: #ffffff;
-        }
-
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--bg-color);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .chat-container {
-            width: 100%;
-            max-width: 600px;
-            height: 80vh;
-            background: white;
-            margin-top: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        header {
-            background: var(--primary-color);
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        #chat-box {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .msg {
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 15px;
-            line-height: 1.5;
-            font-size: 15px;
-        }
-
-        .user {
-            align-self: flex-end;
-            background-color: var(--user-msg);
-            color: #1e40af;
-            border-bottom-right-radius: 2px;
-        }
-
-        .ai {
-            align-self: flex-start;
-            background-color: var(--ai-msg);
-            color: #334155;
-            border: 1px solid #e2e8f0;
-            border-bottom-left-radius: 2px;
-        }
-
-        .input-area {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e2e8f0;
-            display: flex;
-            gap: 10px;
-        }
-
-        input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 25px;
-            outline: none;
-            transition: border 0.3s;
-        }
-
-        input:focus { border-color: var(--primary-color); }
-
-        button {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        button:hover { opacity: 0.9; }
-    </style>
-</head>
+<html>
 <body>
+    <h2>Diagnóstico de Tutor de Mates</h2>
+    <input type="text" id="testInput" value="¿Cuánto es 2+2?">
+    <button onclick="probar()">Probar Conexión</button>
+    <div id="log" style="white-space: pre-wrap; background: #eee; padding: 10px; margin-top: 10px;"></div>
 
-    <div class="chat-container">
-        <header> Eratóstenes: Tutor de Bachillerato</header>
-        <div id="chat-box">
-            <div class="msg ai">¡Hola! Soy tu tutor de matemáticas. ¿Tienes algún problema de derivadas, integrales o matrices que quieras revisar?</div>
-        </div>
-        <div class="input-area">
-            <input type="text" id="user-input" placeholder="Escribe tu duda aquí...">
-            <button onclick="sendMessage()">Enviar</button>
-        </div>
-    </div>
+    <script type="module">
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-
-<script type="module">
-    import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-
-    window.sendMessage = async function() {
-        const API_KEY = "TU_API_KEY_AQUI"; // Asegúrate de que esto sea correcto
-        const input = document.getElementById("user-input");
-        const chatBox = document.getElementById("chat-box");
-        const message = input.value;
-
-        if (!message) return;
-
-        chatBox.innerHTML += `<div class="msg user">${message}</div>`;
-        
-        try {
-            console.log("Iniciando conexión con Google...");
-            const genAI = new GoogleGenerativeAI(API_KEY);
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        window.probar = async function() {
+            const log = document.getElementById("log");
+            const key = "TU_API_KEY_AQUI"; // <--- PON TU LLAVE AQUÍ
             
-            const result = await model.generateContent(message);
-            const response = await result.response;
-            const text = response.text();
+            log.innerHTML = "Iniciando prueba...";
             
-            chatBox.innerHTML += `<div class="msg ai">${text}</div>`;
-        } catch (e) {
-            console.error("ERROR DETECTADO:", e);
-            // Esto lanzará una ventana emergente con el error real
-            alert("¡ERROR CAPTURADO!\n\nNombre: " + e.name + "\nMensaje: " + e.message);
-            
-            chatBox.innerHTML += `<div class="msg ai" style="color:red">Error real: ${e.message}</div>`;
+            try {
+                const genAI = new GoogleGenerativeAI(key);
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                const result = await model.generateContent(document.getElementById("testInput").value);
+                const response = await result.response;
+                log.innerHTML = "✅ ÉXITO: " + response.text();
+            } catch (error) {
+                log.innerHTML = "❌ ERROR: " + error.message;
+                console.error(error);
+            }
         }
-        input.value = "";
-    }
-</script>
+    </script>
 </body>
 </html>
