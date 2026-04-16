@@ -125,49 +125,36 @@
 
 
 <script type="module">
-    // Importación directa compatible con GitHub Pages
     import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-    const API_KEY = "TU_API_KEY_AQUI"; // REVISA QUE ESTÉ BIEN PEGADA
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    
-    const systemInstruction = "Eres un tutor de matemáticas de bachillerato...";
-
-    const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
-        systemInstruction: systemInstruction 
-    });
-
-    const chat = model.startChat({ history: [] });
-
     window.sendMessage = async function() {
+        const API_KEY = "TU_API_KEY_AQUI"; // Asegúrate de que esto sea correcto
         const input = document.getElementById("user-input");
         const chatBox = document.getElementById("chat-box");
-        const message = input.value.trim();
-        
+        const message = input.value;
+
         if (!message) return;
 
         chatBox.innerHTML += `<div class="msg user">${message}</div>`;
-        input.value = "";
-        chatBox.scrollTop = chatBox.scrollHeight;
-
+        
         try {
-            // Cambiamos el método ligeramente para asegurar compatibilidad
-            const result = await chat.sendMessage(message);
+            console.log("Iniciando conexión con Google...");
+            const genAI = new GoogleGenerativeAI(API_KEY);
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            
+            const result = await model.generateContent(message);
             const response = await result.response;
             const text = response.text();
             
             chatBox.innerHTML += `<div class="msg ai">${text}</div>`;
-            if (window.MathJax) MathJax.typesetPromise();
+        } catch (e) {
+            console.error("ERROR DETECTADO:", e);
+            // Esto lanzará una ventana emergente con el error real
+            alert("¡ERROR CAPTURADO!\n\nNombre: " + e.name + "\nMensaje: " + e.message);
             
-        } catch (error) {
-    console.error("Detalles del error:", error);
-    // Esto te dirá el error real en la pantalla del chat
-    chatBox.innerHTML += `<div class="msg ai" style="color:red">
-        <b>Error técnico:</b> ${error.message}
-    </div>`;
-}
-        chatBox.scrollTop = chatBox.scrollHeight;
+            chatBox.innerHTML += `<div class="msg ai" style="color:red">Error real: ${e.message}</div>`;
+        }
+        input.value = "";
     }
 </script>
 </body>
